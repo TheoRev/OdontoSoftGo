@@ -1,23 +1,25 @@
-package controller_api
+package controllers
 
 import (
 	"encoding/json"
 	"fmt"
 	"log"
 	"net/http"
+	"strconv"
 
 	"github.com/TheoRev/OdontoSoft_Backend/config"
 	"github.com/TheoRev/OdontoSoft_Backend/models"
 	"github.com/TheoRev/OdontoSoft_Backend/util"
+	"github.com/gorilla/mux"
 )
 
-// CreateTreatment crea un nuevo tratamiento en la db
-func CreateTreatment(w http.ResponseWriter, r *http.Request) {
-	treatment := models.Treatment{}
+// CreateTreatmentDetail crea un registro de curaciones
+func CreateTreatmentDetail(w http.ResponseWriter, r *http.Request) {
+	td := models.TreatmentDetail{}
 	msg := models.Message{}
-	err := json.NewDecoder(r.Body).Decode(&treatment)
+	err := json.NewDecoder(r.Body).Decode(&td)
 	if err != nil {
-		msg.Message = fmt.Sprintf("Error al leer el tratamiento a registrar: %s", err)
+		msg.Message = fmt.Sprintf("Error al leer la curación a registrar: %s", err)
 		msg.Code = http.StatusBadRequest
 		util.DisplayMessage(w, msg)
 		return
@@ -26,7 +28,7 @@ func CreateTreatment(w http.ResponseWriter, r *http.Request) {
 	db := config.GetConnection()
 	defer db.Close()
 
-	err = db.Create(&treatment).Error
+	err = db.Create(&td).Error
 	if err != nil {
 		msg.Message = fmt.Sprintf("Error al crear el registro: %s", err)
 		msg.Code = http.StatusBadRequest
@@ -34,18 +36,18 @@ func CreateTreatment(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	msg.Message = "Tratamiento creado con éxito"
+	msg.Message = "Curación creada con éxito"
 	msg.Code = http.StatusCreated
 	util.DisplayMessage(w, msg)
 }
 
-// UpdateTreatment actualiza un registro de tratamiento en la db
-func UpdateTreatment(w http.ResponseWriter, r *http.Request) {
-	treatment := models.Treatment{}
+// UpdateTreatmentDetail crea un registro de curaciones
+func UpdateTreatmentDetail(w http.ResponseWriter, r *http.Request) {
+	td := models.TreatmentDetail{}
 	msg := models.Message{}
-	err := json.NewDecoder(r.Body).Decode(&treatment)
+	err := json.NewDecoder(r.Body).Decode(&td)
 	if err != nil {
-		msg.Message = fmt.Sprintf("Error al leer el tratamiento a actualizar: %s", err)
+		msg.Message = fmt.Sprintf("Error al leer la curación a actualizar: %s", err)
 		msg.Code = http.StatusBadRequest
 		util.DisplayMessage(w, msg)
 		return
@@ -54,26 +56,26 @@ func UpdateTreatment(w http.ResponseWriter, r *http.Request) {
 	db := config.GetConnection()
 	defer db.Close()
 
-	err = db.Save(&treatment).Error
+	err = db.Save(&td).Error
 	if err != nil {
-		msg.Message = fmt.Sprintf("Error al actualizar el registro: %s", err)
+		msg.Message = fmt.Sprintf("Error al crear el registro: %s", err)
 		msg.Code = http.StatusBadRequest
 		util.DisplayMessage(w, msg)
 		return
 	}
 
-	msg.Message = "Tratamiento actualizado con éxito"
+	msg.Message = "Curación actualizada con éxito"
 	msg.Code = http.StatusCreated
 	util.DisplayMessage(w, msg)
 }
 
-// DeleteTreatment elimina un registro de tratamiento en la db
-func DeleteTreatment(w http.ResponseWriter, r *http.Request) {
-	treatment := models.Treatment{}
+// DeleteTreatmentDetail crea un registro de curaciones
+func DeleteTreatmentDetail(w http.ResponseWriter, r *http.Request) {
+	td := models.TreatmentDetail{}
 	msg := models.Message{}
-	err := json.NewDecoder(r.Body).Decode(&treatment)
+	err := json.NewDecoder(r.Body).Decode(&td)
 	if err != nil {
-		msg.Message = fmt.Sprintf("Error al leer el tratamiento a eliminar: %s", err)
+		msg.Message = fmt.Sprintf("Error al leer la curación a eliminar: %s", err)
 		msg.Code = http.StatusBadRequest
 		util.DisplayMessage(w, msg)
 		return
@@ -82,30 +84,33 @@ func DeleteTreatment(w http.ResponseWriter, r *http.Request) {
 	db := config.GetConnection()
 	defer db.Close()
 
-	err = db.Delete(&treatment).Error
+	err = db.Delete(&td).Error
 	if err != nil {
-		msg.Message = fmt.Sprintf("Error al eliminar el registro: %s", err)
+		msg.Message = fmt.Sprintf("Error al crear el registro: %s", err)
 		msg.Code = http.StatusBadRequest
 		util.DisplayMessage(w, msg)
 		return
 	}
 
-	msg.Message = "Tratamiento eliminado con éxito"
+	msg.Message = "Curación eliminada con éxito"
 	msg.Code = http.StatusCreated
 	util.DisplayMessage(w, msg)
 }
 
-// FindAllTreatments obtiene todos los tratamientos de la db
-func FindAllTreatments(w http.ResponseWriter, r *http.Request) {
-	treatments := models.Treatments{}
+// FindTreatmentsDetailByTreatmentID obtiene todos los tratamientos de la db
+func FindTreatmentsDetailByTreatmentID(w http.ResponseWriter, r *http.Request) {
+	tsd := models.TreatmentsDetail{}
 	msg := models.Message{}
+
+	vars := mux.Vars(r)
+	treatmentID, _ := strconv.Atoi(vars["id"])
 
 	db := config.GetConnection()
 	defer db.Close()
 
-	err := db.Find(&treatments).Error
-	for i := 0; i < len(treatments); i++ {
-		db.Model(&treatments[i]).Related(&treatments[i].Patient)
+	err := db.Where("treatment_id = ?", treatmentID).Find(&tsd).Error
+	for i := 0; i < len(tsd); i++ {
+		db.Model(&tsd[i]).Related(&tsd[i].Work)
 	}
 
 	if err != nil {
@@ -115,7 +120,7 @@ func FindAllTreatments(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	j, err := json.Marshal(treatments)
+	j, err := json.Marshal(tsd)
 	if err != nil {
 		log.Fatalf("Error al convertir los datos a json: %s", err)
 	}
@@ -124,15 +129,18 @@ func FindAllTreatments(w http.ResponseWriter, r *http.Request) {
 	w.Write(j)
 }
 
-// FindLastTreatment obtiene el ultimo tratamiento registrado en la db
-func FindLastTreatment(w http.ResponseWriter, r *http.Request) {
-	treatment := models.Treatment{}
+// FindAllTreatmentsDetail obtiene todos los tratamientos de la db
+func FindAllTreatmentsDetail(w http.ResponseWriter, r *http.Request) {
+	tsd := models.TreatmentsDetail{}
 	msg := models.Message{}
 
 	db := config.GetConnection()
 	defer db.Close()
 
-	err := db.Last(&treatment).Error
+	err := db.Find(&tsd).Error
+	for i := 0; i < len(tsd); i++ {
+		db.Model(&tsd[i]).Related(&tsd[i].Work)
+	}
 
 	if err != nil {
 		msg.Message = fmt.Sprintf("Error al obtener los datos: %s", err)
@@ -141,7 +149,7 @@ func FindLastTreatment(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	j, err := json.Marshal(treatment)
+	j, err := json.Marshal(tsd)
 	if err != nil {
 		log.Fatalf("Error al convertir los datos a json: %s", err)
 	}

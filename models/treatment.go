@@ -1,13 +1,15 @@
 package models
 
-import "gopkg.in/mgo.v2/bson"
+import "github.com/jinzhu/gorm"
 
 // Treatment estructura de la tabla tratamiento
 type Treatment struct {
-	ID                bson.ObjectId `bson:"_id, omitempty"`
-	PatientID         uint          `bson:", omitempty"`
-	TreatmentDetailID uint          `bson:", omitempty"`
-	Select            bool          
+	gorm.Model
+	PatientID         uint              `json:"patientId" gorm:"not null;type: integer"`
+	Patient           Patient           `json:"patient" gorm:"ForeignKey:TreatmentID;AssociationForeignKey:PatientID"`
+	TreatmentDetailID uint              `json:"treatmentDetailId"`
+	TreatmentsDetail  []TreatmentDetail `json:"treatmenetsDetail" gorm:"ForeignKey:TreatmentID;AssociationForeignKey:TreatmentDetailID"`
+	Select            bool              `json:"select" gorm:"-"`
 }
 
 // Treatments slice de tratamientos

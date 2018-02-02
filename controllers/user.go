@@ -1,4 +1,4 @@
-package controller_api
+package controllers
 
 import (
 	"crypto/sha256"

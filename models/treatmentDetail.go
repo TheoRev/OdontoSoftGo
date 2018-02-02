@@ -1,13 +1,16 @@
 package models
 
-import "gopkg.in/mgo.v2/bson"
+import (
+	"github.com/jinzhu/gorm"
+)
 
 // TreatmentDetail estructura q contienes todas las curaciones realizadas al paciente
 type TreatmentDetail struct {
-	ID          bson.ObjectId `bson:"_id, omitempty"`
-	WorkID      uint          `bson:", omitempty"`
-	Quantity    uint          `bson:", omitempty"`
-	TreatmentID uint          `bson:", omitempty"`
+	gorm.Model
+	WorkID      uint `json:"workId" gorm:"type: integer"`
+	Work        Work `json:"works" gorm:"ForeignKey:TreatmentDetailID;AssociationForeignKey:WorkID"`
+	Quantity    uint `json:"quantity" gorm:"not null; type:integer"`
+	TreatmentID uint `json:"treatmentId" gorm:"type: integer"`
 }
 
 // TreatmentsDetail slice de curaciones de los tratamientos

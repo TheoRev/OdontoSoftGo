@@ -1,7 +1,8 @@
 package routes
 
 import (
-	"github.com/TheoRev/OdontoSoftGo/controller_api"
+	"github.com/TheoRev/OdontoSoft_Backend/controllers"
+
 	"github.com/gorilla/mux"
 	"github.com/urfave/negroni"
 )
@@ -11,10 +12,10 @@ func SetCrudPatientRouter(router *mux.Router) {
 	prefix := "/api/crud/patients"
 	subRouter := mux.NewRouter().PathPrefix(prefix).Subrouter().StrictSlash(true)
 	subRouter.Headers("Access-Control-Allow-Origin", "*")
-	subRouter.HandleFunc("/", controller_api.CreatePatient).Methods("POST")
-	subRouter.HandleFunc("/", controller_api.CreatePatient).Methods("OPTIONS")
-	subRouter.HandleFunc("/", controller_api.UpdatePatient).Methods("PUT")
-	subRouter.HandleFunc("/", controller_api.DeletePatient).Methods("DELETE")
+	subRouter.HandleFunc("/", controllers.CreatePatient).Methods("POST")
+	subRouter.HandleFunc("/", controllers.CreatePatient).Methods("OPTIONS")
+	subRouter.HandleFunc("/", controllers.UpdatePatient).Methods("PUT")
+	subRouter.HandleFunc("/", controllers.DeletePatient).Methods("DELETE")
 
 	router.PathPrefix(prefix).Handler(
 		negroni.New(
@@ -27,7 +28,7 @@ func SetCrudPatientRouter(router *mux.Router) {
 func SetFindAllPatientRouter(router *mux.Router) {
 	prefix := "/api/patients"
 	subRouter := mux.NewRouter().PathPrefix(prefix).Subrouter().StrictSlash(true)
-	subRouter.HandleFunc("/", controller_api.FindAllPatients).Methods("GET")
+	subRouter.HandleFunc("/", controllers.FindAllPatients).Methods("GET")
 
 	router.PathPrefix(prefix).Handler(
 		negroni.New(
@@ -40,20 +41,7 @@ func SetFindAllPatientRouter(router *mux.Router) {
 func SetFindPatientWhitoutTreatmentRouter(router *mux.Router) {
 	prefix := "/api/patients-whitout-treatment"
 	subRouter := mux.NewRouter().PathPrefix(prefix).Subrouter().StrictSlash(true)
-	subRouter.HandleFunc("/", controller_api.FindPatientsWithoutTreatment).Methods("GET")
-
-	router.PathPrefix(prefix).Handler(
-		negroni.New(
-			negroni.Wrap(subRouter),
-		),
-	)
-}
-
-func ShowAllPatients(router *mux.Router){	
-	prefix:="/patients"
-	subRouter:=mux.NewRouter().PathPrefix(prefix)
-	.Subrouter().StrictSlash(true)
-	subRouter.HandlerFunc("/", controller_api.FindAllPatients)
+	subRouter.HandleFunc("/", controllers.FindPatientsWithoutTreatment).Methods("GET")
 
 	router.PathPrefix(prefix).Handler(
 		negroni.New(

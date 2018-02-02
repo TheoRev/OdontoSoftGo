@@ -1,15 +1,15 @@
 package models
 
 import (
-	"gopkg.in/mgo.v2/bson"
+	"github.com/jinzhu/gorm"
 )
 
 // User estructura de la tabla usuario
 type User struct {
-	ID       bson.ObjectId `bson:"_id, omitempty"`
-	Username string        `bson:", omitempty"`
-	Password string        `bson:", omitempty"`
-	Level    string        `bson:", omitempty"`
+	gorm.Model
+	Username string `json:"username" gorm:"not null; type:varchar(25)"`
+	Password string `json:"password" gorm:"not null; type:varchar(256)"`
+	Level    string `json:"level" gorm:"not null; type:varchar(20); default:'ASISTENTE'"`
 }
 
 // Users slice de usuarios

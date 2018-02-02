@@ -1,13 +1,16 @@
 package models
 
-import "gopkg.in/mgo.v2/bson"
+import (
+	"github.com/jinzhu/gorm"
+)
 
 // Work estructura de la tabla trabajo
 type Work struct {
-	ID                bson.ObjectId `bson:"_id, omitempty"`
-	Name              string        `bson:", omitempty"`
-	Price             float64       `bson:", omitempty"`
-	TreatmentDetailID uint          `bson:", omitempty"`
+	gorm.Model
+	Name              string  `json:"name" gorm:"not null; type:varchar(150)"`
+	Price             float64 `json:"price" gorm:"not null; type:decimal(36,2)"`
+	TreatmentDetailID uint    `json:"treatmentDetailID"`
+	WorkID            uint    `json:"workId"`
 }
 
 // Works slice de trabajos
